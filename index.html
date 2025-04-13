@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌲 Kruskal's Algorithm Virtual Lab 🔗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e0f7fa; /* Light Cyan */
+            color: #37474f; /* Blue Grey Darken-3 */
+            line-height: 1.6;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cdefs%3E%3ClinearGradient id="grad1" x1="0%%" y1="0%%" x2="100%%" y2="100%%"%3E%3Cstop offset="0%%" style="stop-color:%23b2ebf2;stop-opacity:0.3" /%3E%3Cstop offset="100%%" style="stop-color:%2380deea;stop-opacity:0.3" /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="100" height="100" fill="url(%23grad1)" /%3E%3Cpath d="M0 100 L100 0 L100 100 Z" fill-opacity="0.1" fill="%234dd0e1" /%3E%3Cpath d="M0 0 L100 0 L0 100 Z" fill-opacity="0.1" fill="%2326c6da" /%3E%3C/svg%3E');
+            background-size: 200px 200px;
+            display: flex;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 85%;
+            margin: 4rem auto;
+            background-color: #fff; /* White container */
+            padding: 4rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            padding-right: 2rem;
+            flex-shrink: 0;
+        }
+        .main-content {
+            flex-grow: 1;
+        }
+        h1 {
+            color: #4a148c; /* Deep Purple Darken-4 */
+            text-align: left;
+            margin-bottom: 2.5rem;
+            font-size: 2.25rem; /* Enlarged title size */
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .tab-link {
+            background-color: #e1f5fe; /* Light Blue Accent-1 */
+            color: #1e88e5; /* Blue Darken-2 */
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            display: block;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .tab-link:hover {
+            background-color: #b3e5fc; /* Light Blue Accent-2 */
+            color: #1565c0; /* Blue Darken-3 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        .tab-link.active {
+            background-color: #64b5f6; /* Blue Accent-4 */
+            color: #fff;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        }
+        .tab-content {
+            display: none;
+            padding-top: 2rem;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #demo-canvas {
+            border: 2px solid #8bc34a; /* Light Green */
+            background-color: #c8e6c9; /* Light Green lighten-4 */
+            border-radius: 0.75rem;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .graph-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 2.5rem;
+        }
+        .space-y-4 > div {
+            background-color: #f1f8e9; /* Light Green lighten-5 */
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #dcedc8; /* Light Green lighten-3 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .text-gray-700 {
+            color: #546e7a; /* Blue Grey Darken-1 */
+            line-height: 1.7;
+        }
+        .text-gray-800 {
+            color: #263238; /* Blue Grey Darken-4 */
+        }
+        .font-semibold {
+            font-weight: 600;
+        }
+        .text-blue-700 {
+            color: #1976d2; /* Blue Darken-3 */
+        }
+        .bg-gray-100 {
+            background-color: #f5f5f5; /* Grey lighten-4 */
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6rem;
+            border: 1px solid #eee; /* Grey lighten-3 */
+        }
+
+        .bg-blue-500 {
+            background-color: #64b5f6; /* Blue Accent-4 */
+        }
+
+        .bg-blue-500:hover {
+            background-color: #42a5f5; /* Blue Accent-3 */
+        }
+        .bg-green-500 {
+            background-color: #8bc34a; /* Light Green */
+        }
+        .bg-green-500:hover {
+            background-color: #689f38; /* Light Green Darken-1 */
+        }
+        .bg-red-500{
+            background-color: #e57373; /* Red lighten-2 */
+        }
+        .bg-red-500:hover {
+            background-color: #d32f2f; /* Red Darken-2 */
+        }
+
+        .text-white {
+            color: #fff;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .py-2 {
+            padding-top: 0.6rem;
+            padding-bottom: 0.6rem;
+        }
+        .px-4 {
+            padding-left: 1.2rem;
+            padding-right: 1.2rem;
+        }
+
+        .rounded-md {
+            border-radius: 0.6rem;
+        }
+
+        .focus\:outline-none:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+
+        .focus\:shadow-outline:focus {
+            box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.5);
+        }
+        .mt-4{
+            margin-top: 1.2rem;
+        }
+        .flex{
+            display: flex;
+        }
+        .justify-center{
+            justify-content: center;
+        }
+        .space-x-4 > * + * {
+            margin-left: 1.2rem;
+        }
+        .text-red-500{
+            color: #f44336; /* Red */
+        }
+        .text-xs{
+            font-size: 0.8rem;
+            line-height: 1.2rem;
+        }
+        .italic{
+            font-style: italic;
+        }
+        .mt-6 {
+            margin-top: 1.8rem;
+        }
+        .text-center{
+            text-align: center;
+        }
+        .mt-8{
+            margin-top: 2.4rem;
+        }
+        .text-lg{
+            font-size: 1.15rem;
+            line-height: 1.8rem;
+        }
+        .mb-2{
+            margin-bottom: 0.6rem;
+        }
+        .list-disc{
+            list-style-type: disc;
+        }
+        .list-inside{
+            list-style-position: inside;
+        }
+        .space-y-2 > * + *{
+            margin-top: 0.6rem;
+        }
+        ol.list-decimal {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+        }
+        ol.list-decimal > li::marker {
+            font-weight: 500;
+            color: #7b1fa2; /* Deep Purple Darken-3 */
+        }
+        ul.list-disc > li::marker{
+            color: #7b1fa2; /* Deep Purple Darken-3 */
+        }
+        label {
+            color: #546e7a; /* Blue Grey Darken-1 */
+        }
+        textarea, input {
+            background-color: #e0f7fa; /* Light Cyan */
+            color: #37474f; /* Blue Grey Darken-3 */
+            border: 1px solid #b2ebf2; /* Light Cyan lighten-3 */
+        }
+        textarea:focus, input:focus {
+            border-color: #4a148c; /* Deep Purple Darken-4 */
+            box-shadow: 0 0 0 0.2rem rgba(74, 20, 140, 0.25);
+        }
+        #mst-details {
+            background-color: #f1f8e9; /* Light Green lighten-5 */
+            border: 1px solid #dcedc8; /* Light Green lighten-3 */
+        }
+        #mst-details h3 {
+            color: #8e24aa; /* Purple Darken-2 */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function openTab(tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName + "-tab").className += " active";
+            if (tabName === 'demo') {
+                initializeDemo();
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-cyan-100 to-teal-50">
+    <div class="container flex">
+        <div class="sidebar">
+            <h1 class="text-xl font-semibold text-purple-600 mb-4">🌲 Kruskal's Algorithm</h1>
+            <button class="tab-link active" id="details-tab" onclick="openTab('details')">Details</button>
+            <button class="tab-link" id="introduction-tab" onclick="openTab('introduction')">Introduction</button>
+            <button class="tab-link" id="function-tab" onclick="openTab('function')">Function</button>
+            <button class="tab-link" id="demo-tab" onclick="openTab('demo')">Demo</button>
+            <button class="tab-link" id="real-time-applications-tab" onclick="openTab('real-time-applications')">Applications</button>
+        </div>
+        <div class="main-content ml-8">
+            <div id="details" class="tab-content active grid grid-cols-1 md:grid-cols-1 gap-8">
+                <div class="space-y-5">
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-purple-400 mb-3">Type of Graph:</h2>
+                        <p class="text-blue-grey-300">Connected, undirected, weighted graph</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-purple-400 mb-3">Goal:</h2>
+                        <p class="text-blue-grey-300">Find a Minimum Spanning Tree (MST) with minimum total edge weight, ensuring no cycles</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-purple-400 mb-3">Algorithmic Paradigm:</h2>
+                        <p class="text-blue-grey-300">Greedy Method (chooses the best local option at every step)</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-purple-400 mb-3">Basic Idea:</h2>
+                        <p class="text-blue-grey-300">Select the smallest weight edge that doesn't form a cycle and add it to MST</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-purple-400 mb-3">Key Steps:</h2>
+                        <ol class="list-decimal list-inside space-y-3 text-blue-grey-300">
+                            <li>Sort all edges in non-decreasing order of weight</li>
+                            <li>Initialize MST as empty</li>
+                            <li>Use Disjoint Set (Union-Find) to track connected components</li>
+                            <li>For each edge (u, v):
+                                <ul class="list-disc list-inside ml-6 space-y-1">
+                                    <li>If u and v belong to different sets:
+                                        <ul class="list-disc list-inside ml-6">
+                                            <li>Add edge to MST</li>
+                                            <li>Merge the sets</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>Repeat until MST has (V - 1) edges</li>
+                        </ol>
+                    </div>
+                    <div
+                    class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-
+                        purple-400 mb-3">Data Structure Used for Cycle Detection:</h2>
+                        <p class="text-blue-grey-300">Union-Find data structure</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-
+                        purple-400 mb-3">Time Complexity:</h2>
+                        <p class="text-blue-grey-300">O(E log E)</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        <h2 class="text-xl font-semibold text-purple-400 mb-3">Space Complexity:</h2>
+                        <p class="text-blue-grey-300">O(V + E)</p>
+                    </div>
+                </div>
+            </div>
+            <div id="introduction" class="tab-content space-y-5">
+                <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                    <h2 class="text-xl font-semibold text-teal-400 mb-3">Definition</h2>
+                    <p class="text-blue-grey-300">
+                        Kruskal's algorithm is a <span class="font-semibold text-teal-600">greedy algorithm</span> used to find a <span class="font-semibold text-teal-600">Minimum Spanning Tree (MST)</span> in a weighted, undirected graph.
+                    </p>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                    <h2 class="text-xl font-semibold text-teal-400 mb-3">Problem Statement</h2>
+                    <p class="text-blue-grey-300">
+                        Given a connected, undirected graph with weighted edges, the goal of Kruskal's algorithm is to find a subset of the edges that forms a tree that includes every vertex, such that the sum of the weights of the edges in the tree is <span class="font-semibold text-teal-600">minimized</span>.
+                    </p>
+                </div>
+            </div>
+            <div id="function" class="tab-content space-y-5">
+                <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                    <h2 class="text-xl font-semibold text-purple-400 mb-3">Kruskal's Algorithm Function</h2>
+                    <pre class="bg-gray-100 p-5 rounded-md overflow-x-auto text-sm text-purple-700 font-mono"><code>
+#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+// Structure to represent an edge
+struct Edge {
+    int src, dest, weight;
+};
+
+// Comparison function for sorting edges by weight
+int compareEdges(const void* a, const void* b) {
+    struct Edge* edgeA = (struct Edge*)a;
+    struct Edge* edgeB = (struct Edge*)b;
+    return edgeA->weight - edgeB->weight;
+}
+
+// Structure to represent a subset for union-find
+struct Subset {
+    int parent;
+    int rank;
+};
+
+// Function to find the set of an element i
+int find(struct Subset subsets[], int i) {
+    if (subsets[i].parent != i)
+        subsets[i].parent = find(subsets, subsets[i].parent);
+    return subsets[i].parent;
+}
+
+// Function to perform union of two sets x and y by rank
+void unionSets(struct Subset subsets[], int x, int y) {
+    int xroot = find(subsets, x);
+    int yroot = find(subsets, y);
+
+    if (subsets[xroot].rank < subsets[yroot].rank)
+        subsets[xroot].parent = yroot;
+    else if (subsets[xroot].rank > subsets[yroot].rank)
+        subsets[yroot].parent = xroot;
+    else {
+        subsets[yroot].parent = xroot;
+        subsets[xroot].rank++;
+    }
+}
+
+// Kruskal's algorithm implementation
+void kruskalMST(int V, struct Edge edges[], int E) {
+    // Sort the edges by weight
+    qsort(edges, E, sizeof(edges[0]), compareEdges);
+
+    // Allocate memory for the MST result
+    struct Edge* result = (struct Edge*)malloc((V - 1) * sizeof(struct Edge));
+    int e = 0; // Index variable for result[]
+    int i = 0; // Index variable for sorted edges
+
+    // Allocate memory for V subsets
+    struct Subset* subsets = (struct Subset*)malloc(V * sizeof(struct Subset));
+
+    // Initialize V subsets with single elements
+    for (int v = 0; v < V; v++) {
+        subsets[v].parent = v;
+        subsets[v].rank = 0;
+    }
+
+    // Iterate through all sorted edges
+    while (e < V - 1 && i < E) {
+        // Pick the smallest edge
+        struct Edge currentEdge = edges[i++];
+
+        int x = find(subsets, currentEdge.src);
+        int y = find(subsets, currentEdge.dest);
+
+        // If including this edge doesn't cause cycle, include it
+        // in result and increment the index of result for next edge
+        if (x != y) {
+            result[e++] = currentEdge;
+            unionSets(subsets, x, y);
+        }
+        // Else discard the currentEdge
+    }
+
+    // Print the edges of the constructed MST
+    printf("Edges in Minimum Spanning Tree:\n");
+    int minimumCost = 0;
+    for (i = 0; i < e; i++) {
+        printf("%d -- %d  Weight: %d\n", result[i].src, result[i].dest, result[i].weight);
+        minimumCost += result[i].weight;
+    }
+
+    printf("Minimum Cost of MST: %d\n", minimumCost);
+
+    free(result);
+    free(subsets);
+}
+
+// Example usage (you would typically get this from user input or a file)
+// int main() {
+//     int V = 4; // Number of vertices
+//     int E = 5; // Number of edges
+//     struct Edge edges[E];
+
+//     // Add edges
+//     edges[0].src = 0; edges[0].dest = 1; edges[0].weight = 10;
+//     edges[1].src = 0; edges[1].dest = 2; edges[1].weight = 6;
+//     edges[2].src = 0; edges[2].dest = 3; edges[2].weight = 5;
+//     edges[3].src = 1; edges[1].dest = 3; edges[1].weight = 15;
+//     edges[4].src = 2; edges[2].dest = 3; edges[2].weight = 4;
+
+//     kruskalMST(V, edges, E);
+
+//     return 0;
+// }
+                    </code></pre>
+                </div>
+            </div>
+            <div id="demo" class="tab-content space-y-5">
+                <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                    <h2 class="text-xl font-semibold text-yellow-600 mb-3">Demo of Kruskal's Algorithm</h2>
+                    <p class="text-blue-grey-300 mb-4">
+                        This interactive demo visualizes Kruskal's algorithm step by step. The graph below will be updated as the algorithm progresses, showing the selected edges and the Minimum Spanning Tree (MST) being formed.
+                    </p>
+
+                    <div class="mb-4">
+                        <label for="matrix-input" class="block text-blue-grey-300 text-sm font-bold mb-2">Enter Adjacency Matrix (comma-separated, e.g., "0,2,0,6,0, 2,0,3,8,5, 0,3,0,0,7, 6,8,0,0,9, 0,5,7,9,0"):</label>
+                        <textarea id="matrix-input" class="shadow appearance-none border rounded w-full py-2 px-3 text-blue-grey-400 leading-tight focus:outline-none focus:shadow-outline bg-blue-grey-50 border-blue-grey-200" rows="4"></textarea>
+                        <p id="matrix-error" class="text-red-600 text-xs italic" style="display: none;">Invalid matrix input.</p>
+                    </div>
+
+                    <div class="graph-container">
+                        <canvas id="demo-canvas" width="600" height="400"></canvas>
+                    </div>
+
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <button id="start-button" class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline" onclick="initializeDemo()">Start Demo</button>
+                        <button id="next-step-button" class="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline" onclick="nextStep()" disabled>Next Step</button>
+                        <button id="reset-button" class="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline" onclick="resetDemo()" disabled>Reset</button>
+                    </div>
+                    <div id="explanation-text" class="mt-6 text-blue-grey-300 text-center italic">
+                        Click "Start Demo" to begin.
+                    </div>
+
+                    <div id="mst-details" class="mt-8 p-5 bg-white rounded-lg shadow-md border border-blue-grey-100" style="display: none;">
+                        <h3 class="text-lg font-semibold text-yellow-600 mb-3">Minimum Spanning Tree Details</h3>
+                        <ul id="mst-edges-list" class="list-disc list-inside text-blue-grey-300">
+                        </ul>
+                        <p id="mst-total-weight" class="text-blue-grey-400 font-medium mt-2"></p>
+                    </div>
+
+                </div>
+            </div>
+            <div id="real-time-applications" class="tab-content space-y-5">
+                <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                    <h2 class="text-xl font-semibold text-green-600 mb-3">Real-Time Applications of Kruskal's Algorithm</h2>
+                    <ul class="list-disc list-inside space-y-3 text-blue-grey-300">
+                        <li><span class="font-semibold text-green-700">Network Design:</span> Used to find the most cost-effective way to connect devices in a network.</li>
+                        <li><span class="font-semibold text-green-700">Telecommunications:</span> Helps in planning cable laying to minimize costs.</li>
+                        <li><span class="font-semibold text-green-700">Circuit Design:</span> Aids in designing efficient circuit layouts.</li>
+                        <li><span class="font-semibold text-green-700">Infrastructure Planning:</span> Used in the construction of roads, railways, and power grids.</li>
+                        <li><span class="font-semibold text-green-700">Image Processing:</span> Can be used for image segmentation.</li>
+                        <li><span class="font-semibold text-green-700">Clustering Algorithms:</span> Concepts can be applied in some clustering techniques.</li>
+                        <li><span class="font-semibold text-green-700">Ecological Modeling:</span> Analyzing connections in food webs or habitat networks.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+let canvas = document.getElementById('demo-canvas');
+let ctx = canvas.getContext('2d');
+let graph = [];
+let vertices = [];
+let edges = [];
+let mstEdges = [];
+let parent = [];
+let rank = [];
+let sortedEdges = [];
+let currentStep = 0;
+let explanationText = document.getElementById('explanation-text');
+let startButton = document.getElementById('start-button');
+let nextStepButton = document.getElementById('next-step-button');
+let resetButton = document.getElementById('reset-button');
+let isDemoInitialized = false;
+let matrixInput = document.getElementById('matrix-input');
+let matrixError = document.getElementById('matrix-error');
+
+let mstDetailsSection = document.getElementById('mst-details');
+let mstEdgesList = document.getElementById('mst-edges-list');
+let mstTotalWeightElement = document.getElementById('mst-total-weight');
+
+
+function initializeDemo() {
+    isDemoInitialized = false;
+    graph = [];
+    vertices = [];
+    edges = [];
+    mstEdges = [];
+    parent = [];
+    rank = [];
+    sortedEdges = [];
+    currentStep = 0;
+    ne = 1;
+    min_cost = 0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    mstDetailsSection.style.display = 'none';
+    mstEdgesList.innerHTML = '';
+    mstTotalWeightElement.textContent = '';
+
+
+    // Get the input matrix
+    const matrixString = matrixInput.value.trim();
+    if (!matrixString) {
+        matrixError.textContent = "Please enter the adjacency matrix.";
+        matrixError.style.display = "block";
+        startButton.disabled = false;
+        nextStepButton.disabled = true;
+        resetButton.disabled = true;
+        return;
+    }
+
+    // Parse the input string into a 2D array
+    const rows = matrixString.split(',');
+    const numVertices = Math.sqrt(rows.length);
+
+    if (numVertices % 1 !== 0 || rows.length !== numVertices * numVertices) {
+        matrixError.textContent = "Invalid matrix format. Please enter a square matrix.";
+        matrixError.style.display = "block";
+        startButton.disabled = false;
+        nextStepButton.disabled = true;
+        resetButton.disabled = true;
+        return;
+    }
+
+    graph = [];
+    for (let i = 0; i < numVertices; i++) {
+        graph[i] = [];
+        for (let j = 0; j < numVertices; j++) {
+            const val = parseInt(rows[i * numVertices + j].trim());
+            if (isNaN(val)) {
+                matrixError.textContent = "Invalid matrix format. Please enter numbers only.";
+                matrixError.style.display = "block";
+                startButton.disabled = false;
+                nextStepButton.disabled = true;
+                resetButton.disabled = true;
+                return;
+            }
+            graph[i][j] = val;
+        }
+    }
+
+    if (numVertices > vertices.length) {
+        vertices = [];
+        for (let i = 0; i < numVertices; i++) {
+            vertices.push(String.fromCharCode(65 + i));
+        }
+    } else {
+            vertices = vertices.slice(0,numVertices);
+    }
+    matrixError.style.display = "none";
+
+
+
+    explanationText.textContent = "Demo Started! Finding edges and sorting them.";
+    startButton.disabled = true;
+    nextStepButton.disabled = false;
+    resetButton.disabled = false;
+    isDemoInitialized = true;
+
+
+
+    // 1. Create edge list
+    edges = []; // Reset the edges array
+    for (let i = 0; i < graph.length; i++) {
+        for (let j = i + 1; j < graph.length; j++) {
+            if (graph[i][j] !== 0) {
+                edges.push({ source: i, target: j, weight: graph[i][j] });
+            }
+        }
+    }
+
+    // 2. Sort edges
+    sortedEdges = [...edges].sort((a, b) => a.weight - b.weight);
+
+    // 3. Initialize parent and rank for Union-Find
+    for (let i = 0; i < graph.length; i++) {
+        parent[i] = i;
+        rank[i] = 0;
+    }
+
+    drawGraph();
+}
+
+
+function drawGraph() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const width = canvas.width;
+    const height = canvas.height;
+    const numVertices = graph.length;
+    const radius = 20;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const angleStep = (2 * Math.PI) / numVertices;
+    const x = centerX + 150 * Math.cos(angle);
+        const y= centerY + 150 * Math.sin(angle);
+        nodeCoordinates.push({ x, y });
+    }
+
+    // Draw edges
+    for (let i = 0; i < edges.length; i++) {
+        const { source, target, weight } = edges[i];
+        const startNode = nodeCoordinates[source];
+        const endNode = nodeCoordinates[target];
+
+        ctx.beginPath();
+        ctx.moveTo(startNode.x, startNode.y);
+        ctx.lineTo(endNode.x, endNode.y);
+        ctx.strokeStyle = mstEdges.find(e => (e.source === source && e.target === target) || (e.source === target && e.target === source)) ? '#4caf50' : '#9e9e9e'; // Green for MST, Grey for others
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw weight
+        const weightX = (startNode.x + endNode.x) / 2;
+        const weightY = (startNode.y + endNode.y) / 2;
+        ctx.font = '14px Poppins';
+        ctx.fillStyle = '#616161';
+        ctx.textAlign = 'center';
+        ctx.fillText(weight, weightX, weightY);
+    }
+
+    // Draw nodes
+    for (let i = 0; i < numVertices; i++) {
+        const { x, y } = nodeCoordinates[i];
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = '#81c784'; // Light Green
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw vertex labels
+        ctx.font = '16px Poppins';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText(vertices[i], x, y + 5);
+    }
+
+
+
+
+function find(parent, i) {
+    if (parent[i] === i)
+        return i;
+    return parent[i] = find(parent, parent[i]);
+}
+
+function union(parent, rank, x, y) {
+    const xroot = find(parent, x);
+    const yroot = find(parent, y);
+
+    if (xroot !== yroot) {
+        if (rank[xroot] < rank[yroot])
+            parent[xroot] = yroot;
+        else if (rank[xroot] > rank[yroot])
+            parent[yroot] = xroot;
+        else {
+            parent[yroot] = xroot;
+            rank[xroot]++;
+        }
+        return true;
+    }
+    return false;
+}
+
+function nextStep() {
+    if (!isDemoInitialized) return;
+
+    if (currentStep < sortedEdges.length) {
+        const { source, target, weight } = sortedEdges[currentStep];
+        const u = source;
+        const v = target;
+
+        const x = find(parent, u);
+        const y = find(parent, v);
+
+        explanationText.textContent = `Checking edge (${vertices[u]}, ${vertices[v]}) with weight ${weight}. Edge (${vertices[u]}, ${vertices[v]}) is ${x === y ? 'rejected (creates cycle)' : 'added to MST'}.`;
+
+
+        if (union(parent, rank, x, y)) {
+            mstEdges.push({ source, target, weight });
+           // explanationText.textContent += ` Edge (${vertices[u]}, ${vertices[v]}) added to MST.`;
+        } else {
+           // explanationText.textContent += ` Edge (${vertices[u]}, ${vertices[v]}) creates a cycle and is rejected.`;
+        }
+        currentStep++;
+        drawGraph();
+
+        if (mstEdges.length === graph.length - 1) {
+            explanationText.textContent = "Kruskal's Algorithm finished. Minimum Spanning Tree is shown in green.";
+            nextStepButton.disabled = true;
+
+            displayMSTDetails();
+        }
+    } else {
+        explanationText.textContent = "All edges have been processed.";
+        nextStepButton.disabled = true;
+    }
+}
+
+function resetDemo() {
+    isDemoInitialized = false;
+    graph = [];
+    vertices = [];
+    edges = [];
+    mstEdges = [];
+    parent = [];
+    rank = [];
+    sortedEdges = [];
+    currentStep = 0;
+    ne = 1;
+    min_cost = 0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    explanationText.textContent = "Demo reset. Enter graph data and click 'Start Demo' to begin.";
+    matrixInput.value = '';
+    matrixError.style.display = 'none';
+    startButton.disabled = false;
+    nextStepButton.disabled = true;
+    resetButton.disabled = true;
+
+    mstDetailsSection.style.display = 'none';
+    mstEdgesList.innerHTML = '';
+    mstTotalWeightElement.textContent = '';
+}
+
+function displayMSTDetails() {
+    mstDetailsSection.style.display = 'block';
+    mstEdgesList.innerHTML = '';
+    let totalWeight = 0;
+
+    if (mstEdges.length === 0) {
+        mstEdgesList.innerHTML = 'No edges in MST.';
+        mstTotalWeightElement.textContent = 'Total Weight: 0';
+        return;
+    }
+
+    mstEdges.forEach(edge => {
+        const li = document.createElement('li');
+        li.textContent = `Edge (${vertices[edge.source]}, ${vertices[edge.target]}) - Weight: ${edge.weight}`;
+        mstEdgesList.appendChild(li);
+        totalWeight += edge.weight;
+    });
+
+    mstTotalWeightElement.textContent = `Total Weight: ${totalWeight}`;
+}
+    </script>
+</body>
+</html>
