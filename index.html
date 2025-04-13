@@ -320,14 +320,14 @@
                         </ol>
                     </div>
                     <div
-                    class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
+                        class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
                         <h2 class="text-xl font-semibold text-
                         purple-400 mb-3">Data Structure Used for Cycle Detection:</h2>
                         <p class="text-blue-grey-300">Union-Find data structure</p>
                     </div>
                     <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
                         <h2 class="text-xl font-semibold text-
-                        purple-400 mb-3">Time Complexity:</h2>
+                            purple-400 mb-3">Time Complexity:</h2>
                         <p class="text-blue-grey-300">O(E log E)</p>
                     </div>
                     <div class="bg-white p-5 rounded-lg shadow-md border border-blue-grey-100">
@@ -437,7 +437,7 @@ void kruskalMST(int V, struct Edge edges[], int E) {
     printf("Edges in Minimum Spanning Tree:\n");
     int minimumCost = 0;
     for (i = 0; i < e; i++) {
-        printf("%d -- %d  Weight: %d\n", result[i].src, result[i].dest, result[i].weight);
+        printf("%d -- %d \tWeight: %d\n", result[i].src, result[i].dest, result[i].weight);
         minimumCost += result[i].weight;
     }
 
@@ -540,6 +540,7 @@ let matrixError = document.getElementById('matrix-error');
 let mstDetailsSection = document.getElementById('mst-details');
 let mstEdgesList = document.getElementById('mst-edges-list');
 let mstTotalWeightElement = document.getElementById('mst-total-weight');
+let nodeCoordinates = [];
 
 
 function initializeDemo() {
@@ -558,6 +559,7 @@ function initializeDemo() {
     mstDetailsSection.style.display = 'none';
     mstEdgesList.innerHTML = '';
     mstTotalWeightElement.textContent = '';
+    nodeCoordinates = [];
 
 
     // Get the input matrix
@@ -652,9 +654,15 @@ function drawGraph() {
     const radius = 20;
     const centerX = width / 2;
     const centerY = height / 2;
-    const angleStep = (2 * Math.PI) / numVertices;
-    const x = centerX + 150 * Math.cos(angle);
-        const y= centerY + 150 * Math.sin(angle);
+    const spacing = Math.min(width, height) * 0.4 / numVertices;
+    const startAngle = -Math.PI / 2; // Start from the top
+
+    nodeCoordinates
+    = [];
+    for (let i = 0; i < numVertices; i++) {
+        const angle = startAngle + (2 * Math.PI * i) / numVertices;
+        const x = centerX + Math.cos(angle) * (Math.min(width, height) * 0.3);
+        const y = centerY + Math.sin(angle) * (Math.min(width, height) * 0.3);
         nodeCoordinates.push({ x, y });
     }
 
@@ -697,8 +705,7 @@ function drawGraph() {
         ctx.textAlign = 'center';
         ctx.fillText(vertices[i], x, y + 5);
     }
-
-
+}
 
 
 function find(parent, i) {
@@ -779,10 +786,12 @@ function resetDemo() {
     startButton.disabled = false;
     nextStepButton.disabled = true;
     resetButton.disabled = true;
+    nodeCoordinates = [];
 
     mstDetailsSection.style.display = 'none';
     mstEdgesList.innerHTML = '';
     mstTotalWeightElement.textContent = '';
+    drawGraph(); // Redraw the empty graph if needed, or just clear the canvas
 }
 
 function displayMSTDetails() {
